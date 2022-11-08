@@ -22,7 +22,7 @@ def insert_into_timetable(start_date, start_time, end_date, end_time, project, t
         cursor.close()
         return 'The hours were successfully inserted into the timetable'
     except (Exception, psycopg2.DatabaseError) as error:
-        return f'The hour were not inserted into the timetable'
+        return 'The hour were not inserted into the timetable'
     finally:
         if con is not None:
             con.close()
