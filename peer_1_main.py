@@ -44,21 +44,21 @@ if __name__ == "__main__":
             try:
                 validtime = datetime.strptime(start_date, "%y-%m-%d")
             except ValueError:
-                print(f"Invalid time format. Insert: (yy-mm-dd)")
+                print("Invalid time format. Insert: (yy-mm-dd)")
                 continue
             
             start_time = input("Please insert the start time (00:00:00): ")
             try:
                 validtime = datetime.strptime(start_time, "%H:%M:%S")
             except ValueError:
-                print(f"Invalid time format. Insert: (00:00:00)")
+                print("Invalid time format. Insert: (00:00:00)")
                 continue
             
             end_date = input("Please insert the ending date (yy-mm-dd): ")
             try:
                 validtime = datetime.strptime(end_date, "%y-%m-%d")
             except ValueError:
-                print(f"Invalid time format. Insert: (yy-mm-dd)")
+                print("Invalid time format. Insert: (yy-mm-dd)")
                 continue
             if datetime.strptime(end_date, "%y-%m-%d") < datetime.strptime(start_date, "%y-%m-%d"):
                 print("End date cannot be before start date. Please insert the ending date again.")
@@ -68,7 +68,7 @@ if __name__ == "__main__":
             try:
                 validtime = datetime.strptime(end_time, "%H:%M:%S")
             except ValueError:
-                print(f"Invalid time format. Insert: (00:00:00)")
+                print("Invalid time format. Insert: (00:00:00)")
                 continue
 
             project = input("Please insert the project the work is aimed at: ")
