@@ -29,7 +29,6 @@ def insert_into_timetable(start_date, start_time, end_date, end_time, project, t
 
 
 
-
 if __name__ == "__main__":
     while True:
         print ("""
@@ -72,6 +71,7 @@ if __name__ == "__main__":
                 continue
 
             project = input("Please insert the project the work is aimed at: ")
+            
             tasks = input("Please insert the tasks worked on: ")
 
             print('')
