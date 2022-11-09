@@ -44,7 +44,7 @@ def subscribe_to_topic_2(topicarn, email):
     return response['SubscriptionArn']
 
 def publish_message(topicarn, message):
-    client = boto3.client('sns')
+    client = boto3.client('sns', region_name='us-east-1')
     response = client.publish(
         TopicArn=topicarn,
         Message=message)
