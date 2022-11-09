@@ -22,7 +22,7 @@ def insert_into_timetable(start_date, start_time, end_date, end_time, project, t
         cursor.close()
         return 'The hours were successfully inserted into the timetable'
     except (Exception, psycopg2.DatabaseError) as error:
-        return f'The hour were not inserted into the timetable, {error}'
+        return 'The hour were not inserted into the timetable'
     finally:
         if con is not None:
             con.close()
@@ -43,21 +43,21 @@ if __name__ == "__main__":
             try:
                 validtime = datetime.strptime(start_date, "%y-%m-%d")
             except ValueError:
-                print(f"Invalid time format. Insert: (yy-mm-dd)")
+                print("Invalid time format. Insert: (yy-mm-dd)")
                 continue
             
             start_time = input("Please insert the start time (00:00:00): ")
             try:
                 validtime = datetime.strptime(start_time, "%H:%M:%S")
             except ValueError:
-                print(f"Invalid time format. Insert: (00:00:00)")
+                print("Invalid time format. Insert: (00:00:00)")
                 continue
             
             end_date = input("Please insert the ending date (yy-mm-dd): ")
             try:
                 validtime = datetime.strptime(end_date, "%y-%m-%d")
             except ValueError:
-                print(f"Invalid time format. Insert: (yy-mm-dd)")
+                print("Invalid time format. Insert: (yy-mm-dd)")
                 continue
             if datetime.strptime(end_date, "%y-%m-%d") < datetime.strptime(start_date, "%y-%m-%d"):
                 print("End date cannot be before start date. Please insert the ending date again.")
@@ -67,7 +67,7 @@ if __name__ == "__main__":
             try:
                 validtime = datetime.strptime(end_time, "%H:%M:%S")
             except ValueError:
-                print(f"Invalid time format. Insert: (00:00:00)")
+                print("Invalid time format. Insert: (00:00:00)")
                 continue
 
             project = input("Please insert the project the work is aimed at: ")
