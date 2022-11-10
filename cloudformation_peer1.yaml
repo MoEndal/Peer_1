@@ -37,7 +37,25 @@ Resources:
     Properties: 
       InternetGatewayId: !Ref Peer1InternetGateway
       VpcId: !Ref VPCPeer1
-      
+
+  Peer1RouteTable:  
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref VPCPeer1
+
+  Peer1RouteOutside:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref Peer1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Peer1InternetGateway
+  
+  AddSubnetToRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetAInstance
+      RouteTableId: !Ref Peer1RouteTable
+
   DatabaseSecurityGroup:
     Type: AWS::RDS::DBSecurityGroup
     Properties:
@@ -76,13 +94,6 @@ Resources:
       MapPublicIpOnLaunch: true
       CidrBlock: 10.0.1.0/24
       VpcId: !Ref VPCPeer1
-  SubnetBInstance:
-    Type: AWS::EC2::Subnet
-    Properties: 
-      AvailabilityZone: us-east-1b
-      MapPublicIpOnLaunch: true
-      CidrBlock: 10.0.2.0/24
-      VpcId: !Ref VPCPeer1
   SubnetADB:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -90,11 +101,27 @@ Resources:
       MapPublicIpOnLaunch: false
       CidrBlock: 10.0.3.0/24
       VpcId: !Ref VPCPeer1
+  SubnetBDB:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: us-east-1b
+      MapPublicIpOnLaunch: false
+      CidrBlock: 10.0.4.0/24
+      VpcId: !Ref VPCPeer1
+  
+  PeerSubnetDBGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: Peer1 project 1 database subnet group
+      DBSubnetGroupName: peer1dbsubnetgroup
+      SubnetIds: [!Ref SubnetADB, !Ref SubnetBDB]
 
   Peer1AInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref Peer1Instance
+      KeyName: joona-kp-virginia-usa
+      IamInstanceProfile: Peer_1_Cron_IAM_Role
       ImageId: !Ref LatestAmiId
       SecurityGroupIds: [!Ref InstanceSecurityGroup]
       SubnetId: !Ref SubnetAInstance
@@ -110,43 +137,8 @@ Resources:
             pip3 install boto3
             su ec2-user
             cd home/ec2-user
-            git clone
-            https://github.com/MoEndal/Peer_1.git
-            sudo echo '0 0 * * * /usr/bin/python3 /home/ec2-user/Peer_1/sns.py' > /var/spool/cron/ec2-user
-          
-  Peer1BInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref Peer1Instance
-      ImageId: !Ref LatestAmiId
-      SecurityGroupIds: [!Ref InstanceSecurityGroup]
-      SubnetId: !Ref SubnetBInstance
-      UserData:
-        Fn::Base64: 
-          !Sub |
-            #!/bin/bash
-            sudo su
-            yum update -y
-            yum install git -y
-            yum install pip -y
-            pip3 install psycopg2-binary
-            pip3 install boto3
-            su ec2-user
-            cd home/ec2-user
-            git clone
-            https://github.com/MoEndal/Peer_1.git
-    
-
-  Peer1LoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Name: peer1-alb-cloudformation
-      Scheme: internet-facing
-      Type: application
-      Subnets:
-        - !Ref SubnetAInstance
-        - !Ref SubnetBInstance
-      
+            git clone https://github.com/MoEndal/Peer_1.git
+            sudo echo '0 0 * * * /usr/bin/python3 /home/ec2-user/Peer_1/sns.py' > /var/spool/cron/ec2-user      
  
   MyRDS:
     Type: AWS::RDS::DBInstance
@@ -154,9 +146,8 @@ Resources:
       DBName: Peer1_timetable
       DBSecurityGroups: [!Ref DatabaseSecurityGroup]
       AllocatedStorage: '20'
-      DBSubnetGroupName: !Ref SubnetADB
+      DBSubnetGroupName: !Ref PeerSubnetDBGroup
       DBInstanceClass: db.t3.micro
       Engine: postgres
       MasterUsername: '{{resolve:secretsmanager:Peer_1_secrets:SecretString:user}}'
       MasterUserPassword: '{{resolve:secretsmanager:Peer_1_secrets:SecretString:password}}'
-      
